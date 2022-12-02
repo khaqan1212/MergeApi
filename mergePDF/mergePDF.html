@@ -1,0 +1,27 @@
+<template>
+    hello world
+    <lightning-layout>
+
+        <lightning-layout-item size='6'>
+
+            <lightning-card class="slds-p-around_xx-small slds-form_stacked">
+                <lightning-file-upload
+                    label="Attach Files"
+                    name="fileUploader"
+                    accept={acceptedFormats}
+                    onuploadfinished={handleUploadFinished}
+                    multiple
+                    >
+                </lightning-file-upload>
+
+                <lightning-button class="slds-p-around_xx-small" variant="brand" label="Merge PDFs" onclick={handleRefreshList}>
+                </lightning-button>
+                <lightning-button class="slds-p-around_xx-small" variant="brand" label="Open Merged PDF" onclick={handleRefreshList}>
+                </lightning-button>
+            </lightning-card>
+        </lightning-layout-item>
+        
+    </lightning-layout>
+
+
+</template>
