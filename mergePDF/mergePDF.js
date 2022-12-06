@@ -2,31 +2,28 @@ import { LightningElement, api, track } from 'lwc';
 import getPublicURLs from '@salesforce/apex/MergePDFController.getPublicUrlForContentDocuments';
 import sendRequestMergePDF from '@salesforce/apex/MergePDFController.getMergedPdfUrl';
 
+const MergeAPIConstants = Object.freeze({
+    FilesLimit : 2
+})
+
 export default class MergePDF extends LightningElement {
 
     get acceptedFormats() {
         return ['.pdf'];
     }
 
-    handleUploadFinished(event) {
+    async handleUploadFinished(event) {
         // Get the list of uploaded files
-        const uploadedFiles = event.detail.files;
-        if(uploadedFiles.length === 2){
-            let docIds = [];
-            uploadedFiles.forEach((item)=>{
-                docIds.push(item.documentId);
-            })
-            getPublicURLs({
+        const { files } = event.detail;
+        if(files.length === MergeAPIConstants.FilesLimit){
+            const docIds = files.map((item) => item.documentId);
+            let result = await getPublicURLs({
                 docIds : docIds
-            })
-            .then(result=>{
-                sendRequestMergePDF({
-                    urlsList : result
-                })
-                .then(result => {
-                    console.log('generated url: ', result);
-                })
-            })
+            });
+            let mergedURL = await sendRequestMergePDF({
+                urlsList : result
+            });
+            window.open(JSON.parse(mergedURL)?.FileUrl, '_blank').focus();
         } else {
             alert('Attach only two pdf files')
         }
