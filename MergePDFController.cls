@@ -18,9 +18,8 @@ public with sharing class MergePDFController {
             //inserting ContentDistribution to make public Urls available for these objects
             insert contentDistributionList;    
 
-            List<ContentDistribution> contentDistributionPublicItems = MergeApiQueries.QueryContentDistributionFromDocumentIds(docIds);
             String[] publicUrls = new String[]{};
-            for(ContentDistribution cdPublic : contentDistributionPublicItems){
+            for(ContentDistribution cdPublic : MergeApiQueries.QueryContentDistributionFromDocumentIds(docIds)){
                 publicUrls.add(cdPublic.ContentDownloadUrl);
             }
             return publicUrls;
