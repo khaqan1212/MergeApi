@@ -4,7 +4,7 @@ public with sharing class MergePDFController {
     public static string[] getPublicUrlForContentDocuments(List<String> docIds){
         try {
             List<ContentDistribution> contentDistributionList = new List<ContentDistribution>();
-            for(ContentVersion cv : MergeApiQueries.QueryContentVersionFromDocumentIds(docIds);){
+            for(ContentVersion cv : MergeApiQueries.QueryContentVersionFromDocumentIds(docIds)){
                 ContentDistribution cd = new ContentDistribution();
                 cd.Name = 'Test';
                 cd.ContentVersionId = cv.id;
