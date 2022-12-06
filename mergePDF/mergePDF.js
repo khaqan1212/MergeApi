@@ -16,15 +16,13 @@ export default class MergePDF extends LightningElement {
         // Get the list of uploaded files
         const { files } = event.detail;
         if(files.length === MergeAPIConstants.FilesLimit){
-            const docIds = files.map((item)=>
-                item.documentId
-            )
+            const docIds = files.map((item) => item.documentId);
             let result = await getPublicURLs({
                 docIds : docIds
-            })
+            });
             let mergedURL = await sendRequestMergePDF({
                 urlsList : result
-            })
+            });
             window.open(JSON.parse(mergedURL)?.FileUrl, '_blank').focus();
         } else {
             alert('Attach only two pdf files')
