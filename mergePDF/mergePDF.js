@@ -16,10 +16,9 @@ export default class MergePDF extends LightningElement {
         // Get the list of uploaded files
         const { files } = event.detail;
         if(files.length === MergeAPIConstants.FilesLimit){
-            let docIds = [];
-            files.forEach((item)=>{
-                docIds.push(item.documentId);
-            })
+            let docIds = files.map((item)=>
+                item.documentId
+            )
             let result = await getPublicURLs({
                 docIds : docIds
             })
