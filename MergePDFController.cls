@@ -3,7 +3,7 @@ public with sharing class MergePDFController {
     @AuraEnabled
     public static string[] getPublicUrlForContentDocuments(List<String> docIds){
         try {
-            List<ContentVersion> cvList = [select id from contentversion where contentdocumentid IN:docIds];
+            List<ContentVersion> cvList = MergeApiQueries.QueryContentVersionFromDocumentIds(docIds);
             List<ContentDistribution> contentDistributionList = new List<ContentDistribution>();
             for(ContentVersion cv : cvList){
                 ContentDistribution cd = new ContentDistribution();
@@ -16,14 +16,15 @@ public with sharing class MergePDFController {
                 cd.PreferencesAllowOriginalDownload= true;
                 contentDistributionList.add(cd);
             }
-            insert contentDistributionList;     
-            List<ContentDistribution> contentDistributionPublicItems = [SELECT DistributionPublicUrl, ContentDownloadUrl FROM ContentDistribution WHERE ContentDocumentId=:docIds];
-            system.debug('ulrs: '+contentDistributionPublicItems);
+            insert contentDistributionList;    
+
+            List<ContentDistribution> contentDistributionPublicItems = MergeApiQueries.QueryContentDistributionFromDocumentIds(docIds);
             String[] publicUrls = new String[]{};
             for(ContentDistribution cdPublic : contentDistributionPublicItems){
                 publicUrls.add(cdPublic.ContentDownloadUrl);
             }
             return publicUrls;
+
         } catch (Exception e) {
             system.debug('excepion : '+ e);
             throw new AuraHandledException(e.getMessage());
@@ -32,12 +33,28 @@ public with sharing class MergePDFController {
 
     @AuraEnabled
     public static string getMergedPdfUrl(String[] urlsList){
+        CreateMergePDFRequest mergePdfRequest = new CreateMergePDFRequest(MergeAPIConstants.SalesforceOrgId, urlsList);
+        return sendRequestMergeAPI(JSON.serialize(mergePdfRequest));
+    }
+
+    public static String sendRequestMergeAPI(String requestBody ){
+        HttpRequest req = new HttpRequest();
+        HttpResponse res = new HttpResponse();
+        Http http = new Http();
+
+        req.setMethod('POST');
+        req.setEndPoint(MergeAPIConstants.BaseURL);
+        req.setHeader('Content-Type' , 'application/json');
+        req.setHeader('Accept' , 'application/json');
+        req.setHeader('authorizationToken' , MergeAPIConstants.AccessToken);
+        req.setBody(requestBody);
+
         try {
-            MergePDFCallout mergePDFsRequest = new MergePDFCallout(urlsList[0], urlsList[1]);
-            //UpdateCustomerQueueable updateCust = new UpdateCustomerQueueable(recordId, n);
-            Id jobId = System.enqueueJob(mergePDFsRequest);
-            system.debug(jobId);
-            return 'abc';
+            res = http.send(req);
+            system.debug('Status code: ' + res.getStatusCode());
+            system.debug(res.getBody());
+            return res.getBody();
+
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
         }
