@@ -16,6 +16,7 @@ public with sharing class MergePDFController {
                 cd.PreferencesAllowOriginalDownload= true;
                 contentDistributionList.add(cd);
             }
+            //inserting ContentDistribution to make public Urls available for these objects
             insert contentDistributionList;    
 
             List<ContentDistribution> contentDistributionPublicItems = MergeApiQueries.QueryContentDistributionFromDocumentIds(docIds);
