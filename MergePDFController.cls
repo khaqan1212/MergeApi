@@ -3,9 +3,8 @@ public with sharing class MergePDFController {
     @AuraEnabled
     public static string[] getPublicUrlForContentDocuments(List<String> docIds){
         try {
-            List<ContentVersion> cvList = MergeApiQueries.QueryContentVersionFromDocumentIds(docIds);
             List<ContentDistribution> contentDistributionList = new List<ContentDistribution>();
-            for(ContentVersion cv : cvList){
+            for(ContentVersion cv : MergeApiQueries.QueryContentVersionFromDocumentIds(docIds);){
                 ContentDistribution cd = new ContentDistribution();
                 cd.Name = 'Test';
                 cd.ContentVersionId = cv.id;
